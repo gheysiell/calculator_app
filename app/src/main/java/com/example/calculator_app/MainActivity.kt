@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -22,42 +23,66 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalculatorApp() {
     var display by remember { mutableStateOf("") }
     var result by remember { mutableStateOf("") }
 
     MaterialTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            DisplayScreen(
-                display,
-                result,
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            CalculatorButtons { button ->
-                when (button) {
-                    "=" -> {
-                        result = try {
-                            display.let {
-                                val evaluation = evaluateExpression(it)
-                                display = evaluation
-                                evaluation
+        Scaffold(
+            topBar = {
+                Surface(
+                    shadowElevation = 10.dp,
+                ) {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                "Calculadora",
+                            )
+                        },
+                        colors = TopAppBarDefaults.mediumTopAppBarColors(
+                            containerColor = Color(0xFF6200EE),
+                            titleContentColor = Color.White,
+                        ),
+                    )
+                }
+            },
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                DisplayScreen(
+                    display,
+                    result,
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                CalculatorButtons { button ->
+                    when (button) {
+                        "=" -> {
+                            result = try {
+                                display.let {
+                                    val evaluation = evaluateExpression(it)
+                                    display = evaluation
+                                    evaluation
+                                }
+                            } catch (e: Exception) {
+                                "Erro"
                             }
-                        } catch (e: Exception) {
-                            "Erro"
                         }
-                    }
-                    "C" -> {
-                        display = ""
-                        result = ""
-                    }
-                    else -> {
-                        display += button
+
+                        "C" -> {
+                            display = ""
+                            result = ""
+                        }
+
+                        else -> {
+                            display += button
+                        }
                     }
                 }
             }
@@ -120,6 +145,7 @@ fun CalculatorButtons(onClick: (String) -> Unit) {
         }
     }
 }
+
 
 fun evaluateExpression(expression: String): String {
     try {
